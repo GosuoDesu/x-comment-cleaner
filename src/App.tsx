@@ -8,12 +8,44 @@ function App() {
   const [maximumCommentAmount, setMaximumCommentAmount] = useState<number>(3);
   const [isAllowEmojiOnlyComment, setIsAllowEmojiOnlyComment] = useState<boolean>(false);
   const [isKillerOn, setIsKillerOn] = useState<boolean>(true);
+  const [blackListOwnerTags, setBlackListOwnerTags] = useState<string[]>([]);
 
   useEffect(() => {
-    getLocal(StorageTag.isFilterCopycat, (data) => { setIsFilterCopycat(data.isFilterCopycat) });
-    getLocal(StorageTag.maximumCommentAmount, (data) => { setMaximumCommentAmount(data.maximumCommentAmount) });
-    getLocal(StorageTag.isAllowEmojiOnlyComment, (data) => { setIsAllowEmojiOnlyComment(data.isAllowEmojiOnlyComment) });
-    getLocal(StorageTag.isKillerOn, (data) => { setIsKillerOn(data.isKillerOn) });
+    getLocal(StorageTag.isFilterCopycat, (data) => {
+      if (data.isFilterCopycat === undefined) {
+        storeLocal(StorageTag.isFilterCopycat, false);
+      } else {
+        setIsFilterCopycat(data.isFilterCopycat);
+      }
+    });
+    getLocal(StorageTag.maximumCommentAmount, (data) => {
+      if (data.maximumCommentAmount === undefined) {
+        storeLocal(StorageTag.maximumCommentAmount, 3);
+      } else {
+        setMaximumCommentAmount(data.maximumCommentAmount);
+      }
+    });
+    getLocal(StorageTag.isAllowEmojiOnlyComment, (data) => {
+      if (data.isAllowEmojiOnlyComment === undefined) {
+        storeLocal(StorageTag.isAllowEmojiOnlyComment, false);
+      } else {
+        setIsAllowEmojiOnlyComment(data.isAllowEmojiOnlyComment);
+      }
+    });
+    getLocal(StorageTag.isKillerOn, (data) => {
+      if (data.isKillerOn === undefined) {
+        storeLocal(StorageTag.isKillerOn, true);
+      } else {
+        setIsKillerOn(data.isKillerOn);
+      }
+    });
+    getLocal(StorageTag.blackListOwnerTags, (data) => {
+      if (data.blackListOwnerTags === undefined) {
+        storeLocal(StorageTag.blackListOwnerTags, []);
+      } else {
+        setBlackListOwnerTags(data.blackListOwnerTags);
+      }
+    });
   }, []);
 
   const updateFilterCopycat = (isFilterCopycat: boolean): void => {
@@ -32,6 +64,11 @@ function App() {
     storeLocal(StorageTag.isKillerOn, isKillerOn);
   }
 
+  const clearBlackListOwnerTags = (): void => {
+    setBlackListOwnerTags([]);
+    storeLocal(StorageTag.blackListOwnerTags, []);
+  }
+
   return (
     <div className="App" style={{
       padding: '20px',
@@ -39,6 +76,7 @@ function App() {
       width: 'min-content',
     }}>
       <h1>X Comment Cleaner</h1>
+      <NumberInput label="Blacklisted Account Number" value={blackListOwnerTags.length ?? 0} editable={false} />
       <SwitchSelector label="Killer On" checked={isKillerOn} onChange={() => {
         setIsKillerOn(!isKillerOn);
         updateKillerOn(!isKillerOn);
@@ -55,6 +93,7 @@ function App() {
         setIsAllowEmojiOnlyComment(!isAllowEmojiOnlyComment);
         updateAllowEmojiOnlyComment(!isAllowEmojiOnlyComment);
       }} />
+      <button onClick={clearBlackListOwnerTags}>Clear Blacklist</button>
     </div>
   );
 }

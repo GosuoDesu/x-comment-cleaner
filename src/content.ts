@@ -1,6 +1,4 @@
-/*global chrome*/
-
-import { getLocal, StorageTag } from "./constant/Storage";
+import { addToLocalList, getLocal, StorageTag } from "./constant/Storage";
 
 interface Tweet {
     baseNode: HTMLElement;
@@ -49,6 +47,7 @@ function levenshteinDistance(a: string, b: string): number {
 const addToBlackList = (tweetOwnerTag: string): void => {
     if (!blackListOwnerTags.includes(tweetOwnerTag)) {
         blackListOwnerTags.push(tweetOwnerTag);
+        addToLocalList(StorageTag.blackListOwnerTags, tweetOwnerTag);
     }
 }
 
@@ -89,6 +88,9 @@ const HandleTweetContent = () => {
     let isKillerOn: boolean = true;
     getLocal(StorageTag.isKillerOn, (data) => {
         isKillerOn = data.isKillerOn || true;
+    });
+    getLocal(StorageTag.blackListOwnerTags, (data) => {
+        blackListOwnerTags.push(...(data.blackListOwnerTags || []));
     });
 
     const clearHandledTweets = (): void => {
