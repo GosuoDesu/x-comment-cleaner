@@ -1,5 +1,3 @@
-/*global chrome*/
-
 import { getLocal, StorageTag } from "./constant/Storage";
 
 interface Tweet {
