@@ -4,6 +4,7 @@ const enum StorageTag {
     maximumCommentAmount = 'maximumCommentAmount',
     isAllowEmojiOnlyComment = 'isAllowEmojiOnlyComment',
     isKillerOn = 'isKillerOn',
+    isFilterBannedWordsName = 'isFilterBannedWordsName',
 }
 
 const storeLocal = (key: StorageTag, value: any) => {

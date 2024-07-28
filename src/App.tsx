@@ -8,12 +8,14 @@ function App() {
   const [maximumCommentAmount, setMaximumCommentAmount] = useState<number>(3);
   const [isAllowEmojiOnlyComment, setIsAllowEmojiOnlyComment] = useState<boolean>(false);
   const [isKillerOn, setIsKillerOn] = useState<boolean>(true);
+  const [isFilterBannedWordsName, setIsFilterBannedWordsName] = useState<boolean>(true);
 
   useEffect(() => {
     getLocal(StorageTag.isFilterCopycat, (data) => { setIsFilterCopycat(data.isFilterCopycat) });
     getLocal(StorageTag.maximumCommentAmount, (data) => { setMaximumCommentAmount(data.maximumCommentAmount) });
     getLocal(StorageTag.isAllowEmojiOnlyComment, (data) => { setIsAllowEmojiOnlyComment(data.isAllowEmojiOnlyComment) });
     getLocal(StorageTag.isKillerOn, (data) => { setIsKillerOn(data.isKillerOn) });
+    getLocal(StorageTag.isFilterBannedWordsName, (data) => { setIsFilterBannedWordsName(data.isFilterBannedWordsName) });
   }, []);
 
   const updateFilterCopycat = (isFilterCopycat: boolean): void => {
@@ -30,6 +32,10 @@ function App() {
 
   const updateKillerOn = (isKillerOn: boolean): void => {
     storeLocal(StorageTag.isKillerOn, isKillerOn);
+  }
+
+  const updateFilterBannedWordsName = (isFilterBannedWordsName: boolean): void => {
+    storeLocal(StorageTag.isFilterBannedWordsName, isFilterBannedWordsName);
   }
 
   return (
@@ -54,6 +60,10 @@ function App() {
       <SwitchSelector label="Allow Emoji Only Comment" checked={isAllowEmojiOnlyComment} onChange={() => {
         setIsAllowEmojiOnlyComment(!isAllowEmojiOnlyComment);
         updateAllowEmojiOnlyComment(!isAllowEmojiOnlyComment);
+      }} />
+      <SwitchSelector label="Filter Banned Words Name" checked={isFilterBannedWordsName} onChange={() => {
+        setIsFilterBannedWordsName(!isFilterBannedWordsName);
+        updateFilterBannedWordsName(!isFilterBannedWordsName);
       }} />
     </div>
   );

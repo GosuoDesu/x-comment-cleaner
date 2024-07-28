@@ -1,3 +1,4 @@
+import { bannedCharacters } from "./constant/Characters";
 import { getLocal, StorageTag } from "./constant/Storage";
 
 interface Tweet {
@@ -88,6 +89,10 @@ const HandleTweetContent = () => {
     getLocal(StorageTag.isKillerOn, (data) => {
         isKillerOn = data.isKillerOn || true;
     });
+    let isFilterBannedWordsName: boolean = true;
+    getLocal(StorageTag.isFilterBannedWordsName, (data) => {
+        isFilterBannedWordsName = data.isFilterBannedWordsName || true;
+    });
 
     const clearHandledTweets = (): void => {
         handledTweets.splice(0, handledTweets.length);
@@ -164,7 +169,7 @@ const HandleTweetContent = () => {
 
                     if (isTweetValid) {
                         incrementCommentCount(tweetOwnerTag);
-                        if (isZombieComment(tweetContent, tweetOwnerTag, tweetTime)) {
+                        if (isZombieComment(tweetRecord)) {
                             addToBlackList(tweetOwnerTag);
                             removeParentNode(tweet as HTMLElement);
                         } else {
@@ -194,14 +199,16 @@ const HandleTweetContent = () => {
 
     }
 
-    const isZombieComment = (comment: string | undefined | null, tweetOwnerTag: string, tweetTime: Date): boolean => {
+    const isZombieComment = (tweet: Tweet): boolean => {
+        const { tweetContent: comment, tweetOwnerTag, tweetTime, tweetOwnerName } = tweet;
         if (isTurnOnCopyCat) {
             handleCopyCat(comment || "", tweetOwnerTag, tweetTime);
         }
 
         const trimedComment: string = comment?.trim() || "";
         const isEmoji: boolean = trimedComment.length === 0;
-        const isZombie: boolean = (isKillerOn) && ((!isAllowEmojiOnlyComment && isEmoji) || blackListOwnerTags.includes(tweetOwnerTag));
+        const isNameContainBannedWord: boolean = bannedCharacters.some((char) => tweetOwnerName.includes(char));
+        const isZombie: boolean = (isKillerOn) && ((isFilterBannedWordsName && isNameContainBannedWord) || (!isAllowEmojiOnlyComment && isEmoji) || blackListOwnerTags.includes(tweetOwnerTag));
         if (isZombie) {
             zombieCount++;
         }
@@ -222,7 +229,7 @@ const HandleTweetContent = () => {
 
     const handleOldComments = (): void => {
         handledTweets.forEach((tweet) => {
-            if (isZombieComment(tweet.tweetContent, tweet.tweetOwnerTag, tweet.tweetTime)) {
+            if (isZombieComment(tweet)) {
                 addToBlackList(tweet.tweetOwnerTag);
                 removeParentNode(tweet.baseNode);
                 removeHandledTweet(tweet);
